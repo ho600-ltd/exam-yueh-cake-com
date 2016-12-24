@@ -57,7 +57,7 @@ def lambda_handler(event, context):
 
         user_directory = '%s/%s-%s' % (S3_LOCATION, user_email, public_key_file_key_id)
         index_html = re.sub('<div id="build_version">.*</div>',
-                            '<div id="create_time">%s</div>'%datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S+UTC'),
+                            '<div id="create_time">Create Time at %s</div>'%datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S+UTC'),
                             open('index.html', 'r').read())
 
         client = boto3.client('s3')
@@ -65,7 +65,7 @@ def lambda_handler(event, context):
             ACL='public-read',
             Body=index_html,
             Bucket=S3_BUCKET,
-            ContentType='text/plain',
+            ContentType='text/html',
             Key='%s/index.html' % user_directory,
             StorageClass='STANDARD',
         )
