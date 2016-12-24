@@ -1,3 +1,4 @@
 .idea/
 documentations/_build/
 aws_lambda/upload_pgp_file_to_s3/pgpdump*
+*.key.asc
