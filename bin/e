@@ -1,0 +1,2 @@
+#!/bin/bash
+source /var/www/exam-yueh-cake-com-env/bin/activate
