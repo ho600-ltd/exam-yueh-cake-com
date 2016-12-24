@@ -4,7 +4,8 @@ from pgpdump import AsciiData
 
 
 DYNAMODB_TABLE = 'jobs-ho600-com'
-S3_LOCATION = 's3://exam.yueh-cake.com/jobs.at.ho600'
+S3_BUCKET = 'exam.yueh-cake.com'
+S3_LOCATION = 'jobs.at.ho600'
 PUBLIC_KEY_ID = '991028D6'
 
 def lambda_handler(event, context):
@@ -43,6 +44,7 @@ def lambda_handler(event, context):
         elif item.get('public_key_id', ''):
             raise Exception('403 Forbidden: PublicKeyAlreadyExist')
 
+        encrypt_content = event['encrypt_content']
         encrypt_file_key_id_list = []
         for pkeskp in list(AsciiData(encrypt_content).packets()):
             encrypt_file_key_id = getattr(pkeskp, 'key_id', '')[-8:].upper()
@@ -56,6 +58,23 @@ def lambda_handler(event, context):
         #TODO: copy index.html to user_directory
         #TODO: upload 0A.asc to user_directory
         index_html = open('index.html', 'r').read()
+        client = boto3.client('s3')
+        response = client.put_object(
+            ACL='public-read',
+            Body=index_html,
+            Bucket=S3_BUCKET,
+            ContentType='text/plain',
+            Key='%s/index.html' % user_directory,
+            StorageClass='STANDARD',
+        )
+        response = client.put_object(
+            ACL='public-read',
+            Body=encrypt_content,
+            Bucket=S3_BUCKET,
+            ContentType='text/plain',
+            Key='%s/0A.asc' % user_directory,
+            StorageClass='STANDARD',
+        )
 
         response = dynamo.update_item(Key={'email': user_email,
                                            'type': 'apply-account-at-exam.yueh-cake.com'},
@@ -63,6 +82,7 @@ def lambda_handler(event, context):
                                       ExpressionAttributeValues={":public_key_id": public_key_id},
                                       ReturnValues="UPDATED_NEW",
                                       )
+        return {'status': 200, 'message': '/' + user_directory}
 
 
     pass

@@ -2,4 +2,3 @@
 documentations/_build/
 *.key.asc
 aws_lambda/upload_pgp_file_to_s3/pgpdump*
-aws_lambda/upload_pgp_file_to_s3/index.html
