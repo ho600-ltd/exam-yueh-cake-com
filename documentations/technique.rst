@@ -19,7 +19,7 @@
 
 * jobs.at.ho600@exam.yueh-cake.com 公錀
 * 應聘人 PGP 公錀
-* 上傳檔名。創建帳號頁固定是 00A.gpg ，回答問題頁則為 01A.gpg ~ 09A.gpg 。
+* 上傳檔名。創建帳號頁固定是 00A.asc ，回答問題頁則為 01A.asc ~ 09A.asc 。
 * 「純文字」的輸入框
 
 .. note::

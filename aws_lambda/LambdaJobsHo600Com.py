@@ -23,7 +23,7 @@ def lambda_handler(event, context):
         email = event['email']
         message = ''
     elif type == 'apply-account-at-exam.yueh-cake.com':
-        unique_email = '%s@exam.yueh-cake.com' % md5(str(random())).hexdigest()
+        unique_email = '%s@exam.yueh-cake.com' % md5(str(random())).hexdigest().lower()
         email = unique_email
         message = unique_email
     else:
