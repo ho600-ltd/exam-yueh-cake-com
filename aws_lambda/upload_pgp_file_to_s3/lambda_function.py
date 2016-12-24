@@ -55,8 +55,6 @@ def lambda_handler(event, context):
             raise Exception('403 Forbidden: PublicKeyUsageError')
 
         user_directory = '%s/%s-%s' % (S3_LOCATION, user_email, public_key_file_key_id)
-        #TODO: copy index.html to user_directory
-        #TODO: upload 0A.asc to user_directory
         index_html = open('index.html', 'r').read()
         client = boto3.client('s3')
         response = client.put_object(
