@@ -1,4 +1,4 @@
-import re, boto3
+import re, boto3, json
 from time import time
 from pgpdump import AsciiData
 
@@ -16,7 +16,7 @@ def lambda_handler(event, context):
 
     INFO: pgpdump has problem on parse expiration_time.
     """
-    public_key_content = d.get('public_key_content', '')
+    public_key_content = event.get('public_key_content', '')
     if public_key_content:
         if event['filename'] != '0A.asc':
             raise Exception('403 Forbidden: FilenameError')
@@ -55,7 +55,10 @@ def lambda_handler(event, context):
             raise Exception('403 Forbidden: PublicKeyUsageError')
 
         user_directory = '%s/%s-%s' % (S3_LOCATION, user_email, public_key_file_key_id)
-        index_html = open('index.html', 'r').read()
+        index_html = re.sub('<div id="build_version">.*</div>',
+                            '<div id="create_time">%s</div>'%datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S+UTC'),
+                            open('index.html', 'r').read())
+
         client = boto3.client('s3')
         response = client.put_object(
             ACL='public-read',
@@ -94,4 +97,5 @@ if __name__ == '__main__':
         "filename": "0A.asc",
         "encrypt_content": open('id.txt.asc', 'r').read(),
          }
+    print json.dumps(d)
     lambda_handler(d, None)
