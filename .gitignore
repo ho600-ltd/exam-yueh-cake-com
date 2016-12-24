@@ -2,3 +2,4 @@
 documentations/_build/
 *.key.asc
 aws_lambda/upload_pgp_file_to_s3/pgpdump*
+exam.yueh-cake.com/__version__.json
