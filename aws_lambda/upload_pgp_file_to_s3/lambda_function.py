@@ -79,7 +79,8 @@ def lambda_handler(event, context):
         response = dynamo.update_item(Key={'email': user_email,
                                            'type': 'apply-account-at-exam.yueh-cake.com'},
                                       UpdateExpression="set public_key_id = :public_key_id",
-                                      ExpressionAttributeValues={":public_key_id": public_key_id},
+                                      ExpressionAttributeValues={":public_key_id":
+                                                                     public_key_file_key_id},
                                       ReturnValues="UPDATED_NEW",
                                       )
         return {'status': 200, 'message': '/' + user_directory}
@@ -93,6 +94,6 @@ if __name__ == '__main__':
     d = {
         "public_key_content": open('3049DCE8.pkey.asc', 'r').read(),
         "filename": "0A.asc",
-        "encrypt_content": open('id.txt.asc', 'r'),
+        "encrypt_content": open('id.txt.asc', 'r').read(),
          }
     lambda_handler(d, None)
