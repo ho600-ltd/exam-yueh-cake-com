@@ -79,6 +79,7 @@ function send_encrypt_content($self) {
             };
             $.ajax({
                 url: "https://pqpmeji6f4.execute-api.us-west-2.amazonaws.com/prod/uploadpgpfiletos3/",
+                crossDomain: true,
                 data: JSON.stringify(data),
                 type: 'POST',
                 contentType: 'application/json',
