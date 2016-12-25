@@ -18,9 +18,8 @@ def lambda_handler(event, context):
     INFO: pgpdump has problem on parse expiration_time.
     """
     public_key_content = event.get('public_key_content', '')
-    if public_key_content:
-        if event['filename'] != '0A.asc':
-            raise Exception('403 Forbidden: FilenameError')
+    filename = event['filename']
+    if filename == '0A.asc':
         ad = AsciiData(public_key_content)
         adps = list(ad.packets())
         pub_algorithm_type = adps[0].pub_algorithm_type.lower()
@@ -30,20 +29,20 @@ def lambda_handler(event, context):
         public_key_file_key_id = adps[3].key_id[-8:].upper()
 
         if pub_algorithm_type != 'rsa' or raw_pub_algorithm != 1:
-            raise Exception('403 Forbidden: PublicKey TypeError')
+            return {'status': 403, 'message': '403 Forbidden: PublicKey TypeError'}
         if re.sub('(applicants|[ \(\)])', '', user_name):
-            raise Exception('403 Forbidden: PublicKey UserNameError')
+            return {'status': 403, 'message': '403 Forbidden: PublicKey UserNameError'}
 
         dynamo = boto3.resource('dynamodb').Table(DYNAMODB_TABLE)
         response = dynamo.get_item(Key={'email': user_email,
                                         'type': 'apply-account-at-exam.yueh-cake.com'})
         item = response.get('Item', {})
         if not item:
-            raise Exception('403 Forbidden: PublicKey EmailAddressDoesNotExist')
+            return {'status': 403, 'message': '403 Forbidden: PublicKey EmailAddressDoesNotExist'}
         elif (int(item['timestamp']) + 86400) < int(time()):
-            raise Exception('403 Forbidden: EmailAddressExpiration')
+            return {'status': 403, 'message': '403 Forbidden: EmailAddressExpiration'}
         elif item.get('public_key_id', ''):
-            raise Exception('403 Forbidden: PublicKeyAlreadyExist')
+            return {'status': 403, 'message': '403 Forbidden: PublicKeyAlreadyExist'}
 
         encrypt_content = event['encrypt_content']
         encrypt_file_key_id_list = []
@@ -51,9 +50,9 @@ def lambda_handler(event, context):
             encrypt_file_key_id = getattr(pkeskp, 'key_id', '')[-8:].upper()
             if encrypt_file_key_id: encrypt_file_key_id_list.append(encrypt_file_key_id)
         if len(encrypt_file_key_id_list) != 2:
-            raise Exception('403 Forbidden: PublicKeyCountError')
+            return {'status': 403, 'message': '403 Forbidden: PublicKeyCountError'}
         elif PUBLIC_KEY_ID not in encrypt_file_key_id_list or public_key_file_key_id not in encrypt_file_key_id_list:
-            raise Exception('403 Forbidden: PublicKeyUsageError')
+            return {'status': 403, 'message': '403 Forbidden: PublicKeyUsageError'}
 
         client = boto3.client('s3')
 
