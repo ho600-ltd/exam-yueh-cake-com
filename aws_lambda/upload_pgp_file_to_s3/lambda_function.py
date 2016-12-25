@@ -9,6 +9,24 @@ S3_BUCKET = 'exam.yueh-cake.com'
 S3_LOCATION = 'jobs.at.ho600'
 PUBLIC_KEY_ID = '991028D6'
 
+
+def send_notice(email='', filename=''):
+    ses = boto3.client('ses', region_name='us-west-2')
+    body = '''<a href="mailto:%(email)s">%(email)s</a>''' % {'email': email}
+    ses.send_email(Source='service@ho600.com',
+                   Message={
+                       'Subject': {
+                           'Data': 'Applicants(%s) send %s' % (email, filename),
+                           'Charset': 'utf-8'
+                       },
+                       'Body': {
+                           'Text': { 'Data': body, 'Charset': 'utf-8' },
+                           'Html': { 'Data': body, 'Charset': 'utf-8' }
+                       }
+                   },
+                   Destination={ 'ToAddresses': ['hoamon@ho600.com'] })
+
+
 def lambda_handler(event, context):
     """
     :param event:
@@ -31,7 +49,7 @@ def lambda_handler(event, context):
         if pub_algorithm_type != 'rsa' or raw_pub_algorithm != 1:
             return {'status': 403, 'message': '403 Forbidden: PublicKey TypeError'}
         if re.sub('(applicants|[ \(\)])', '', user_name):
-            return {'status': 403, 'message': '403 Forbidden: PublicKey UserNameError'}
+            return {'status': 403, 'message': '403 Forbidden: PublicKey UserNameError, It should be "applicants (applicants) <%s>"'%user_email}
 
         dynamo = boto3.resource('dynamodb').Table(DYNAMODB_TABLE)
         response = dynamo.get_item(Key={'email': user_email,
@@ -90,13 +108,14 @@ def lambda_handler(event, context):
             StorageClass='STANDARD',
         )
 
-        response = dynamo.update_item(Key={'email': user_email,
-                                           'type': 'apply-account-at-exam.yueh-cake.com'},
-                                      UpdateExpression="set public_key_id = :public_key_id",
-                                      ExpressionAttributeValues={":public_key_id":
-                                                                     public_key_file_key_id},
-                                      ReturnValues="UPDATED_NEW",
-                                      )
+        send_notice(email=user_email, filename=filename)
+        dynamo.update_item(Key={'email': user_email,
+                                       'type': 'apply-account-at-exam.yueh-cake.com'},
+                                  UpdateExpression="set public_key_id = :public_key_id",
+                                  ExpressionAttributeValues={":public_key_id":
+                                                                 public_key_file_key_id},
+                                  ReturnValues="UPDATED_NEW",
+                                  )
         return {'status': 200, 'message': user_directory}
 
 
