@@ -93,7 +93,7 @@ def lambda_handler(event, context):
                                                                      public_key_file_key_id},
                                       ReturnValues="UPDATED_NEW",
                                       )
-        return {'status': 200, 'message': '/' + user_directory}
+        return {'status': 200, 'message': user_directory}
 
 
     pass
