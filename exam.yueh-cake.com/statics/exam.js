@@ -119,6 +119,57 @@ function send_encrypt_content($self) {
 };
 
 
+function append_asc (url) {
+    if (url == '0A.asc') {
+        return false;
+    }
+    var $0a = $('#0A');
+    var $ul = $0a.parent();
+    $ul.append($('<li><a target="_blank" href="'+url+'">'+url+'</a></li>'));
+}
+function wait_for_the_next_exam () {
+    $('textarea[name=encrypt_content]').val('Please wait for the next exam').css('background-color', '#d1d1d1');
+    $('input[function_name=send_encrypt_content]').hide();
+}
+
+
+function check_asc_files (index) {
+    if (parseInt(index) >= 9) {
+        return false;
+    }
+    var list = ['A', 'Q'];
+    var a_url = index+list[0]+'.asc';
+    $.ajax({
+        type: 'HEAD',
+        url: a_url,
+        success: function (json) {
+            append_asc(a_url);
+            console.log('success: '+ a_url);
+            index = parseInt(index) + 1;
+            var q_url = index+list[1]+'.asc';
+            $.ajax({
+                type: 'HEAD',
+                url: q_url,
+                success: function (json) {
+                    append_asc(q_url);
+                    console.log('success: '+ q_url);
+                    $('input[name=filename]').val(index+'A.asc');
+                    check_asc_files(index);
+                },
+                error: function () {
+                    console.log('error: '+q_url);
+                    wait_for_the_next_exam();
+                }
+            });
+        },
+        error: function () {
+            console.log('error: '+a_url);
+        }
+    });
+
+};
+
+
 $(document).ready(function() {
     $('form').submit(false);
 
@@ -138,4 +189,9 @@ $(document).ready(function() {
             $('#id_body').removeClass('modal-open');
         }
     });
+
+    if ($('#0A:visible').length > 0) {
+        $('#register_note').remove();
+        check_asc_files('0');
+    }
 });
