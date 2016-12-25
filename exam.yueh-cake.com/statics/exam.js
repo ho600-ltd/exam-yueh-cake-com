@@ -63,41 +63,57 @@ function send_encrypt_content($self) {
             return false;
         }
 
-        var keys = openpgp.key.readArmored(ho600_public_key).keys;
-        keys.push(openpgp.key.readArmored(public_key_content).keys[0]);
-        options = {data: raw_content, publicKeys: keys};
-        openpgp.encrypt(options).then(function(ciphertext) {
-            if(!confirm("Are you sure to send the answer? You can not modify the answer anymore.")) {
+        var ho600_public_keys = openpgp.key.readArmored(ho600_public_key).keys;
+        var public_keys = openpgp.key.readArmored(public_key_content).keys;
+        var keys = [];
+        keys.push(ho600_public_keys[0]);
+        keys.push(public_keys[0]);
+
+        var v_options = {
+            message: openpgp.cleartext.readArmored(raw_content),
+            publicKeys: public_keys
+        };
+        openpgp.verify(v_options).then(function(verified){
+            if(!verified.signatures[0].valid) {
+                show_modal($('#danger_modal'), 'Sign Error', 'The answer has no valid signature!');
                 return false;
-            }
-            encrypt_content = ciphertext.data;
-            $('textarea[name=encrypt_content]', $form).val(encrypt_content);
-            var data = {
-                "public_key_content": public_key_content,
-                "filename": filename,
-                "encrypt_content": encrypt_content
-            };
-            $.ajax({
-                url: "https://pqpmeji6f4.execute-api.us-west-2.amazonaws.com/prod/uploadpgpfiletos3/",
-                crossDomain: true,
-                data: JSON.stringify(data),
-                type: 'POST',
-                contentType: 'application/json',
-                dataType: 'json',
-                complete: function(xhr, text) {
-                    if (/\b200\b/.test(xhr.responseText)) {
-                        var json = $.parseJSON(xhr.responseText);
-                        $('textarea[name=encrypt_content]',
-                            $form).val("Please wait for the question!"
-                        ).css({'readonly': 'readonly', 'disabled': 'disabled'});
-                        var url = json['message'] + '/index.html';
-                        var message = 'Please go to <a href="'+url+'">'+url+'</a>';
-                        show_modal($('#primary_modal'), 'Register Successfully', message);
-                    } else {
-                        show_modal($('#danger_modal'), 'Error', xhr.responseText + text);
+            } else {
+                var options = {data: raw_content, publicKeys: keys};
+                openpgp.encrypt(options).then(function(ciphertext) {
+                    if(!confirm("Are you sure to send the answer? You can not modify the answer anymore.")) {
+                        return false;
                     }
-                }
-            });
+                    encrypt_content = ciphertext.data;
+                    $('textarea[name=encrypt_content]', $form).val(encrypt_content);
+                    var data = {
+                        "public_key_content": public_key_content,
+                        "filename": filename,
+                        "encrypt_content": encrypt_content
+                    };
+                    $.ajax({
+                        url: "https://pqpmeji6f4.execute-api.us-west-2.amazonaws.com/prod/uploadpgpfiletos3/",
+                        crossDomain: true,
+                        data: JSON.stringify(data),
+                        type: 'POST',
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        complete: function(xhr, text) {
+                            if (/\b200\b/.test(xhr.responseText)) {
+                                var json = $.parseJSON(xhr.responseText);
+                                $('textarea[name=encrypt_content]',
+                                    $form).val("Please wait for the question!"
+                                ).css({'readonly': 'readonly', 'disabled': 'disabled'});
+                                var url = '/' + json['message'] + '/';
+                                var message = 'Please go to <a href="'+url+'">'+url+'</a>, and keep the url path in mind.  That is a combination of your public key email and id.';
+                                show_modal($('#primary_modal'), 'Register Successfully', message);
+                            } else {
+                                var json = $.parseJSON(xhr.responseText);
+                                show_modal($('#danger_modal'), 'Error', json['message']);
+                            }
+                        }
+                    });
+                });
+            }
         });
     };
 };
