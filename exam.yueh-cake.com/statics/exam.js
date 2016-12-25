@@ -137,11 +137,13 @@ function check_asc_files (index) {
     if (parseInt(index) >= 9) {
         return false;
     }
+    var d = new Date();
+    var timestamp = d.getTime();
     var list = ['A', 'Q'];
     var a_url = index+list[0]+'.asc';
     $.ajax({
         type: 'HEAD',
-        url: a_url,
+        url: a_url+'?timestamp='+timestamp,
         success: function (json) {
             append_asc(a_url);
             console.log('success: '+ a_url);
@@ -149,7 +151,7 @@ function check_asc_files (index) {
             var q_url = index+list[1]+'.asc';
             $.ajax({
                 type: 'HEAD',
-                url: q_url,
+                url: q_url+'?timestamp='+timestamp,
                 success: function (json) {
                     append_asc(q_url);
                     console.log('success: '+ q_url);
