@@ -134,7 +134,10 @@ function wait_for_the_next_exam () {
 
 
 function check_asc_files (index) {
-    if (parseInt(index) >= 9) {
+    if (parseInt(index) > 9) {
+        var $li = $('form').parent();
+        $('form').remove();
+        $li.append($('<li>It is finish.</li>'));
         return false;
     }
     var d = new Date();
