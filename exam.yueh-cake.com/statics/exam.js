@@ -107,7 +107,7 @@ function send_encrypt_content($self) {
                                     $form).val("Please wait for the question!"
                                 ).css({'readonly': 'readonly', 'disabled': 'disabled'});
                                 if (json['message'] == filename) {
-                                    show_modal($('#primary_modal'), 'Upload Successfully', filename + 'is uploaded');
+                                    show_modal($('#primary_modal'), 'Upload Successfully', filename + ' is uploaded');
                                 } else {
                                     var url = '/' + json['message'] + '/index.html';
                                     var message = 'Please go to <a href="'+url+'">'+url+'</a>, and keep the url path in mind.  That is a combination of your public key email and id.';

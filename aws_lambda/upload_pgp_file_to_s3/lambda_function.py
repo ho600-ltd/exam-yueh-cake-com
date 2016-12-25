@@ -45,14 +45,15 @@ def lambda_handler(event, context):
             if encrypt_file_key_id: encrypt_file_key_id_list.append(encrypt_file_key_id)
         if len(encrypt_file_key_id_list) != 2:
             return {'status': 403, 'message': '403 Forbidden: PublicKeyCountError'}
-        public_key_file_key_id = encrypt_file_key_id_list.remove(PUBLIC_KEY_ID)[0]
+        encrypt_file_key_id_list.remove(PUBLIC_KEY_ID)
+        public_key_file_key_id = encrypt_file_key_id_list[0]
         dynamo = boto3.resource('dynamodb').Table(DYNAMODB_TABLE)
-        response = dynamo.get_item(Key={'public_key_id': public_key_file_key_id,
-                                        'type': 'apply-account-at-exam.yueh-cake.com'})
+        response = dynamo.get_item(Key={'email': public_key_file_key_id,
+                                        'type': 'reverse-apply-account-at-exam.yueh-cake.com'})
         item = response.get('Item', {})
         if not item:
             return {'status': 403, 'message': '403 Forbidden: PublicKeyID DoesNotExist'}
-        email = item.get('email', '')
+        email = item.get('public_key_id_email', '')
         if not email:
             return {'status': 403, 'message': '403 Forbidden: EmailDoesNotExist'}
 
@@ -62,7 +63,7 @@ def lambda_handler(event, context):
             Body=encrypt_content,
             Bucket=S3_BUCKET,
             ContentType='text/plain',
-            Key='%s-%s/%s' % (email, public_key_file_key_id, filename),
+            Key='%s/%s-%s/%s' % (S3_LOCATION, email, public_key_file_key_id, filename),
             StorageClass='STANDARD',
         )
         send_notice(email=email, filename=filename)
@@ -148,6 +149,10 @@ def lambda_handler(event, context):
                                                                  public_key_file_key_id},
                                   ReturnValues="UPDATED_NEW",
                                   )
+        dynamo.put_item(Item={"timestamp": int(time()),
+                              "email": public_key_file_key_id,
+                              "public_key_id_email": user_email,
+                              "type": 'reverse-apply-account-at-exam.yueh-cake.com'})
         return {'status': 200, 'message': user_directory}
     else:
         return {'status': 403, 'message': 'FilenameError'}
