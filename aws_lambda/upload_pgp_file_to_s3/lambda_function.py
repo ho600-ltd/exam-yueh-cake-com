@@ -71,6 +71,14 @@ def lambda_handler(event, context):
         )
         response = client.put_object(
             ACL='public-read',
+            Body=public_key_content,
+            Bucket=S3_BUCKET,
+            ContentType='text/plain',
+            Key='%s/public_key.asc' % user_directory,
+            StorageClass='STANDARD',
+        )
+        response = client.put_object(
+            ACL='public-read',
             Body=encrypt_content,
             Bucket=S3_BUCKET,
             ContentType='text/plain',
