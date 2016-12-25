@@ -86,10 +86,13 @@ function send_encrypt_content($self) {
                     encrypt_content = ciphertext.data;
                     $('textarea[name=encrypt_content]', $form).val(encrypt_content);
                     var data = {
-                        "public_key_content": public_key_content,
                         "filename": filename,
                         "encrypt_content": encrypt_content
                     };
+                    if (filename == "0A.asc") {
+                        data['public_key_content'] = public_key_content;
+                    }
+
                     $.ajax({
                         url: "https://pqpmeji6f4.execute-api.us-west-2.amazonaws.com/prod/uploadpgpfiletos3/",
                         crossDomain: true,
@@ -103,9 +106,13 @@ function send_encrypt_content($self) {
                                 $('textarea[name=encrypt_content]',
                                     $form).val("Please wait for the question!"
                                 ).css({'readonly': 'readonly', 'disabled': 'disabled'});
-                                var url = '/' + json['message'] + '/';
-                                var message = 'Please go to <a href="'+url+'">'+url+'</a>, and keep the url path in mind.  That is a combination of your public key email and id.';
-                                show_modal($('#primary_modal'), 'Register Successfully', message);
+                                if (json['message'] == filename) {
+                                    show_modal($('#primary_modal'), 'Upload Successfully', filename + 'is uploaded');
+                                } else {
+                                    var url = '/' + json['message'] + '/';
+                                    var message = 'Please go to <a href="'+url+'">'+url+'</a>, and keep the url path in mind.  That is a combination of your public key email and id.';
+                                    show_modal($('#primary_modal'), 'Register Successfully', message);
+                                }
                             } else {
                                 var json = $.parseJSON(xhr.responseText);
                                 show_modal($('#danger_modal'), 'Error', json['message']);

@@ -37,7 +37,38 @@ def lambda_handler(event, context):
     """
     public_key_content = event.get('public_key_content', '')
     filename = event['filename']
-    if filename == '0A.asc':
+    if filename != '0A.asc' and filename[1] == 'A':
+        encrypt_content = event['encrypt_content']
+        encrypt_file_key_id_list = []
+        for pkeskp in list(AsciiData(encrypt_content).packets()):
+            encrypt_file_key_id = getattr(pkeskp, 'key_id', '')[-8:].upper()
+            if encrypt_file_key_id: encrypt_file_key_id_list.append(encrypt_file_key_id)
+        if len(encrypt_file_key_id_list) != 2:
+            return {'status': 403, 'message': '403 Forbidden: PublicKeyCountError'}
+        public_key_file_key_id = encrypt_file_key_id_list.remove(PUBLIC_KEY_ID)[0]
+        dynamo = boto3.resource('dynamodb').Table(DYNAMODB_TABLE)
+        response = dynamo.get_item(Key={'public_key_id': public_key_file_key_id,
+                                        'type': 'apply-account-at-exam.yueh-cake.com'})
+        item = response.get('Item', {})
+        if not item:
+            return {'status': 403, 'message': '403 Forbidden: PublicKeyID DoesNotExist'}
+        email = item.get('email', '')
+        if not email:
+            return {'status': 403, 'message': '403 Forbidden: EmailDoesNotExist'}
+
+        client = boto3.client('s3')
+        response = client.put_object(
+            ACL='public-read',
+            Body=encrypt_content,
+            Bucket=S3_BUCKET,
+            ContentType='text/plain',
+            Key='%s-%s/%s' % (email, public_key_file_key_id, filename),
+            StorageClass='STANDARD',
+        )
+        send_notice(email=email, filename=filename)
+        return {'status': 200, 'message': filename}
+
+    elif filename == '0A.asc':
         ad = AsciiData(public_key_content)
         adps = list(ad.packets())
         pub_algorithm_type = adps[0].pub_algorithm_type.lower()
@@ -118,10 +149,8 @@ def lambda_handler(event, context):
                                   ReturnValues="UPDATED_NEW",
                                   )
         return {'status': 200, 'message': user_directory}
-
-
-    pass
-
+    else:
+        return {'status': 403, 'message': 'FilenameError'}
 
 
 if __name__ == '__main__':
