@@ -61,8 +61,8 @@ def lambda_handler(event, context):
         user_directory = '%s/%s-%s' % (S3_LOCATION, user_email, public_key_file_key_id)
         index_html = re.sub('<div id="build_version">.*</div>',
                             '<div id="create_time">Create Time at %s</div>'%datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S+UTC'), index_html)
-        index_html = re.sub('(<textarea[^>]+name="public_key_content">)</textarea>',
-                            '\\1%s</textarea>'%public_key_content,
+        index_html = re.sub('(<textarea[^>]+name="public_key_content")></textarea>',
+                            '\\1 readonly="readonly" style="background-color : #d1d1d1;">%s</textarea>'%public_key_content,
                             index_html)
 
         response = client.put_object(
