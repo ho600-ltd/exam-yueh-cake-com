@@ -78,7 +78,7 @@ function send_encrypt_content($self) {
                 "encrypt_content": encrypt_content
             };
             $.ajax({
-                url: "https://pqpmeji6f4.execute-api.us-west-2.amazonaws.com/prod//",
+                url: "https://pqpmeji6f4.execute-api.us-west-2.amazonaws.com/prod/uploadpgpfiletos3/",
                 data: JSON.stringify(data),
                 type: 'POST',
                 contentType: 'application/json',
