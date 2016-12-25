@@ -57,17 +57,23 @@ def lambda_handler(event, context):
         if not email:
             return {'status': 403, 'message': '403 Forbidden: EmailDoesNotExist'}
 
-        client = boto3.client('s3')
-        response = client.put_object(
-            ACL='public-read',
-            Body=encrypt_content,
-            Bucket=S3_BUCKET,
-            ContentType='text/plain',
-            Key='%s/%s-%s/%s' % (S3_LOCATION, email, public_key_file_key_id, filename),
-            StorageClass='STANDARD',
-        )
-        send_notice(email=email, filename=filename)
-        return {'status': 200, 'message': filename}
+        s3 = boto3.client('s3')
+        _key = '%s/%s-%s/%s' % (S3_LOCATION, email, public_key_file_key_id, filename)
+        try:
+            s3.head_object(Bucket=S3_BUCKET, Key=_key)
+        except:
+            response = s3.put_object(
+                ACL='public-read',
+                Body=encrypt_content,
+                Bucket=S3_BUCKET,
+                ContentType='text/plain',
+                Key=_key,
+                StorageClass='STANDARD',
+            )
+            send_notice(email=email, filename=filename)
+            return {'status': 200, 'message': filename}
+        else:
+            return {'status': 403, 'message': filename + ' was exist'}
 
     elif filename == '0A.asc':
         ad = AsciiData(public_key_content)
@@ -104,9 +110,9 @@ def lambda_handler(event, context):
         elif PUBLIC_KEY_ID not in encrypt_file_key_id_list or public_key_file_key_id not in encrypt_file_key_id_list:
             return {'status': 403, 'message': '403 Forbidden: PublicKeyUsageError'}
 
-        client = boto3.client('s3')
+        s3 = boto3.client('s3')
 
-        response = client.get_object( Bucket=S3_BUCKET, Key='%s/index.html' % S3_LOCATION)
+        response = s3.get_object( Bucket=S3_BUCKET, Key='%s/index.html' % S3_LOCATION)
         index_html = response['Body'].read()
         user_directory = '%s/%s-%s' % (S3_LOCATION, user_email, public_key_file_key_id)
         index_html = re.sub('<div id="build_version">.*</div>',
@@ -116,7 +122,7 @@ def lambda_handler(event, context):
                             index_html)
         index_html = re.sub('<li[^>]+id="0A"[^>]+>', '<li id="0A">', index_html)
 
-        response = client.put_object(
+        response = s3.put_object(
             ACL='public-read',
             Body=index_html,
             Bucket=S3_BUCKET,
@@ -124,7 +130,7 @@ def lambda_handler(event, context):
             Key='%s/index.html' % user_directory,
             StorageClass='STANDARD',
         )
-        response = client.put_object(
+        response = s3.put_object(
             ACL='public-read',
             Body=public_key_content,
             Bucket=S3_BUCKET,
@@ -132,7 +138,7 @@ def lambda_handler(event, context):
             Key='%s/public_key.asc' % user_directory,
             StorageClass='STANDARD',
         )
-        response = client.put_object(
+        response = s3.put_object(
             ACL='public-read',
             Body=encrypt_content,
             Bucket=S3_BUCKET,
