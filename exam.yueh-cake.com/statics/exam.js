@@ -93,10 +93,7 @@ function send_encrypt_content($self) {
                         var message = 'Please go to <a href="'+url+'">'+url+'</a>';
                         show_modal($('#primary_modal'), 'Register Successfully', message);
                     } else {
-                        var json = $.parseJSON(xhr.responseText);
-                        show_modal($('#danger_modal'),
-                            json['status'],
-                            json['message']);
+                        show_modal($('#danger_modal'), 'Error', xhr.responseText);
                     }
                 }
             });
