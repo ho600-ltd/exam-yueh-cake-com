@@ -55,12 +55,17 @@ def lambda_handler(event, context):
         elif PUBLIC_KEY_ID not in encrypt_file_key_id_list or public_key_file_key_id not in encrypt_file_key_id_list:
             raise Exception('403 Forbidden: PublicKeyUsageError')
 
+        client = boto3.client('s3')
+
+        response = client.get_object( Bucket=S3_BUCKET, Key='%s/index.html' % S3_LOCATION)
+        index_html = response['Body'].read()
         user_directory = '%s/%s-%s' % (S3_LOCATION, user_email, public_key_file_key_id)
         index_html = re.sub('<div id="build_version">.*</div>',
-                            '<div id="create_time">Create Time at %s</div>'%datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S+UTC'),
-                            open('index.html', 'r').read())
+                            '<div id="create_time">Create Time at %s</div>'%datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S+UTC'), index_html)
+        index_html = re.sub('(<textarea[^>]+name="public_key_content">)</textarea>',
+                            '\\1%s</textarea>'%public_key_content,
+                            index_html)
 
-        client = boto3.client('s3')
         response = client.put_object(
             ACL='public-read',
             Body=index_html,
