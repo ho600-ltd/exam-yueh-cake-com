@@ -64,13 +64,24 @@ function send_encrypt_content($self) {
         }
 
         var ho600_public_keys = openpgp.key.readArmored(ho600_public_key).keys;
-        var public_keys = openpgp.key.readArmored(public_key_content).keys;
+        try {
+            var public_keys = openpgp.key.readArmored(public_key_content).keys;
+        } catch (err) {
+            show_modal($('#danger_modal'), 'Public Key Format Error', err.message);
+            return false;
+        }
         var keys = [];
         keys.push(ho600_public_keys[0]);
         keys.push(public_keys[0]);
 
+        try {
+            var raw_content_message = openpgp.cleartext.readArmored(raw_content);
+        } catch (err) {
+            show_modal($('#danger_modal'), 'Answer Format Error', err.message);
+            return false;
+        }
         var v_options = {
-            message: openpgp.cleartext.readArmored(raw_content),
+            message: raw_content_message,
             publicKeys: public_keys
         };
         openpgp.verify(v_options).then(function(verified){
