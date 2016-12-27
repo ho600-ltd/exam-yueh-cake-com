@@ -69,6 +69,11 @@ function send_encrypt_content($self) {
         } catch (err) {
             show_modal($('#danger_modal'), 'Public Key Format Error', err.message);
             return false;
+        } finally {
+            if (public_keys.length == 0) {
+                show_modal($('#danger_modal'), 'Public Key Format Error', "Could not import your public key!");
+                return false;
+            }
         }
         var keys = [];
         keys.push(ho600_public_keys[0]);
