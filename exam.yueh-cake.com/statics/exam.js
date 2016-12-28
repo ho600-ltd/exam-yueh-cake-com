@@ -84,6 +84,11 @@ function send_encrypt_content($self) {
         } catch (err) {
             show_modal($('#danger_modal'), 'Answer Format Error', err.message);
             return false;
+        } finally {
+            if (filename == '0A.asc' && ! /^[0-9a-fA-F]{14}$/.test(raw_content_message.text)) {
+                show_modal($('#danger_modal'), 'Answer Format Error', "Only accept 14-digit English numerals(md5 code format)");
+                return false;
+            }
         }
         var v_options = {
             message: raw_content_message,
