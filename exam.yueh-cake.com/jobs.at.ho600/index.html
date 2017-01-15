@@ -44,7 +44,7 @@
     </ul>
     <ul><form>
         <li>Upload filename: </li><li><input name="filename" value="0A.asc" readonly  style="background-color : #d1d1d1;"/></li>
-        <li>Ho600 public key: </li><li><textarea rows="3" cols="100" name="ho600_public_key" readonly style="background-color : #d1d1d1;">-----BEGIN PGP PUBLIC KEY BLOCK-----
+        <li>Ho600 public key(jobs.at.ho600@exam.yueh-cake.com ID: 71424BF9): </li><li><textarea rows="3" cols="100" name="ho600_public_key" readonly style="background-color : #d1d1d1;">-----BEGIN PGP PUBLIC KEY BLOCK-----
 Version: GnuPG v1
 
 mQENBFheeSkBCACo3s9tknTR0wHIJ20Onjpq5y50sZ/Qu9IRG7A6L+7daYVIPDI7
@@ -79,7 +79,20 @@ L/1fMojRuozzHbiIjAF+3VzPrCrwIK82s9bV
         <li>Your public key(in ASCII armor format likes above): </li>
         <li><textarea rows="10" cols="100" name="public_key_content"></textarea></li>
         <li>Your Answer<span id="register_note">(or input 14-digit md5 code for register) with a clearsign to proof you own the private key</span>: </li>
-        <li><textarea rows="20" cols="100" name="encrypt_content" ></textarea></li>
+        <li><textarea rows="20" cols="100" name="encrypt_content" placeholder="The format should like below:
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+01234567891234
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iJwEAQECAAYFAlh66XsACgkQFcbgJxW3fbHj+QP7BN+9nAKQG6AbeNLp5qFbmSVY
+fQLD64trgv2qgLr960kH7P8b6qP9zkkDcNQNJp7YNOC8LtNgCY6QmxYc5amQNdVM
+/7QY8jbskRIwQDmHDoANXAiFGYQ/c7VbyDee5JMVDucM1cwYZL/2EKHiuPjMSeLz
+TFEmRgsP8+Ov9GFG/9k=
+=SF9n
+-----END PGP SIGNATURE-----"></textarea></li>
         <li><input class="click-trigger"
                    type="submit"
                    value="encrypt and send"

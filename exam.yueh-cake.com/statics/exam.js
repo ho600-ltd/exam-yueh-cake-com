@@ -215,7 +215,7 @@ $(document).ready(function() {
     }).show();
 
     $('.modal').on('hidden.bs.modal', function(e) {
-        //INFO 在 modal 上，再 show #search_zipcode_modal ，並關掉 #search_zipcode_modal 後，原 modal 就無法 scroll 了。
+        //INFO: Once on the original modal show it's child modal and close the child modal then cause the original modal could not scroll again.
         if ($('.modal.in').length > 0) {
             $('#id_body').addClass('modal-open');
         } else {
@@ -226,5 +226,10 @@ $(document).ready(function() {
     if ($('#0A:visible').length > 0) {
         $('#register_note').remove();
         check_asc_files('0');
+    }
+
+    if ("" == $('textarea[name=public_key_content]').val()) {
+        var _s = "The format should like below:\n" + $('textarea[name=ho600_public_key]').val();
+        $('textarea[name=public_key_content]').attr('placeholder', _s);
     }
 });
