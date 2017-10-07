@@ -1,0 +1,5 @@
+{
+    "BUILD_NUMBER": "${BITBUCKET_BUILD_NUMBER}",
+    "REVISION": "${REVISION}",
+    "BUILD_TIME": "${BUILD_TIME}"
+}

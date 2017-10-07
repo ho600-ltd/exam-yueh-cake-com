@@ -17,13 +17,9 @@ pipelines:
             - make html
             - mv _build/html ../exam.yueh-cake.com/docs
             - cd ../exam.yueh-cake.com/
-            - cat << EOF > __version__.json
-{
-    "BUILD_NUMBER": "${BITBUCKET_BUILD_NUMBER}",
-    "REVISION": "${REVISION}",
-    "BUILD_TIME": "${BUILD_TIME}"
-}
-EOF
+            - sed -i "s/\${BUILD_NUMBER}/${BITBUCKET_BUILD_NUMBER}/g" __version__.json
+            - sed -i "s/\${REVISION}/${REVISION}/g" __version__.json
+            - sed -i "s/\${BUILD_TIME}/${BUILD_TIME}/g" __version__.json
             - sed "s/\${BUILD_NUMBER}/${BITBUCKET_BUILD_NUMBER}/g" index.html > _index.html
             - sed "s/\${REVISION}/${REVISION}/g" _index.html > __index.html
             - sed "s/\${BUILD_TIME}/${BUILD_TIME}/g" __index.html > ___index.html
