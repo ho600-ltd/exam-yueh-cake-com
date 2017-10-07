@@ -168,7 +168,6 @@ def lambda_handler(event, context):
         user_name = adps[1].user_name.lower()
         user_email = adps[1].user_email.lower()
         public_key_file_key_id = adps[3].key_id[-8:].upper()
-        print("public_key_file_key_id: "+public_key_file_key_id)
 
         if pub_algorithm_type != 'rsa' or raw_pub_algorithm != 1:
             return {'status': 403, 'message': '403 Forbidden: PublicKey TypeError'}
@@ -244,17 +243,16 @@ def lambda_handler(event, context):
                               "email": public_key_file_key_id,
                               "public_key_id_email": user_email,
                               "type": 'reverse-apply-account-at-exam.yueh-cake.com'})
-        if 0:
-            Q1 = encrypt_text(random_q1(), public_keys=[PUBLIC_KEY_CONTENT, public_key_content])
-            response = s3.put_object(
-                ACL='public-read',
-                Body=Q1,
-                Bucket=S3_BUCKET,
-                ContentType='text/plain',
-                Key='%s/1Q.asc' % user_directory,
-                StorageClass='STANDARD',
-            )
-            filename += " and 1Q.asc"
+        Q1 = encrypt_text(random_q1(), public_keys=[PUBLIC_KEY_CONTENT, public_key_content])
+        response = s3.put_object(
+            ACL='public-read',
+            Body=Q1,
+            Bucket=S3_BUCKET,
+            ContentType='text/plain',
+            Key='%s/1Q.asc' % user_directory,
+            StorageClass='STANDARD',
+        )
+        filename += " and 1Q.asc"
         send_notice(email=user_email, filename=filename)
         return {'status': 200, 'message': user_directory}
     else:
@@ -290,7 +288,17 @@ def random_q1():
 
 
 def encrypt_text(text, public_keys=[PUBLIC_KEY_CONTENT]):
-    return text
+    data = {"raw_content": text,
+            "key_contents": public_keys}
+    L = boto3.client('lambda')
+    response = L.invoke(
+        FunctionName='pgp_encrypt',
+        InvocationType='RequestResponse',
+        LogType='None',
+        Payload=json.dumps(data),
+    )
+    encrypt_content = json.loads(response['Payload'].read()).replace(r"\r\n", "\n").replace(r"\n", "\n")
+    return encrypt_content
 
 
 if __name__ == '__main__':
@@ -300,5 +308,4 @@ if __name__ == '__main__':
         "filename": "0A.asc",
         "encrypt_content": open('id.txt.asc', 'r').read(),
          }
-    print(json.dumps(d))
-    print(lambda_handler(d, None))
+    lambda_handler(d, None)
