@@ -1,1 +1,2 @@
-pgpdump
+boto3
+pgpdump==1.5

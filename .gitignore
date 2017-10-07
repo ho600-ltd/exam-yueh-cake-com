@@ -6,4 +6,7 @@ exam.yueh-cake.com/__version__.json
 exam.yueh-cake.com/jobs.at.ho600/54ca36c357a5c2aa175765f90fc51918@exam.yueh-cake.com-3049DCE8/
 public-docs/
 
+aws_lambda/upload_pgp_file_to_s3/upload_pgp_file_to_s3-env/
+bin/upload_pgp_file_to_s3.zip
+
 bin/LambdaJobsHo600Com_function.zip
