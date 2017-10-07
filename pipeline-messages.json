@@ -5,11 +5,11 @@
   },
   "Body": {
     "Text": {
-      "Data": "Please go to exam site( https://exam.yueh-cake.com/ ) to see ${commit_hash} version",
+      "Data": "Please go to exam site( https://exam.yueh-cake.com/ ) to see ${commit_hash} version(git latest log: ${git_log})",
       "Charset": "UTF-8"
     },
     "Html": {
-      "Data": "<h3><a href='https://exam.yueh-cake.com/'>Please go to exam site</a> to see ${commit_hash}  version</h3>",
+      "Data": "<h3><a href='https://exam.yueh-cake.com/'>Please go to exam site</a> to see ${commit_hash}  version(git latest log: ${git_log})</h3>",
       "Charset": "UTF-8"
     }
   }

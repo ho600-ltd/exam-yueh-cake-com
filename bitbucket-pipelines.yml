@@ -10,6 +10,7 @@ pipelines:
     master:
       - step:
           script: # Modify the commands below to build your repository.
+            - GIT_LOG=`git log --pretty=format:"%h%x09%an%x09%ad%x09%s" -1`
             - BUILD_TIME=`date +%Y-%m-%dT%H:%M:%S%z`
             - REVISION=${BITBUCKET_COMMIT::4}
             - pip install "awscli>=1.11,<1.12" "Sphinx>=1.6,<1.7" "sphinx_rtd_theme>=0.2,<0.3"
@@ -34,5 +35,6 @@ pipelines:
             - cd ../../
             - sed -i "s/\${BUILD_TIME}/${BUILD_TIME}/g" pipeline-messages.json
             - sed -i "s/\${commit_hash}/${BITBUCKET_COMMIT}/g" pipeline-messages.json
+            - sed -i "s/\${git_log}/${GIT_LOG}/g" pipeline-messages.json
             - aws s3 sync exam.yueh-cake.com s3://exam.yueh-cake.com
             - aws ses send-email --region us-west-2 --from service@ho600.com --destination file://pipeline-destination.json --message file://pipeline-messages.json
