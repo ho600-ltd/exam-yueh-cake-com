@@ -10,4 +10,4 @@ cd $BASE_DIR
 zip -g upload_pgp_file_to_s3.zip lambda_function.py
 mv upload_pgp_file_to_s3.zip $DIR
 cd ${DIR}
-#aws --profile default --region us-west-2 lambda update-function-code --function-name uploadpgpfiletos3 --zip-file fileb://${DIR}/upload_pgp_file_to_s3.zip
+aws --profile default --region us-west-2 lambda update-function-code --function-name uploadpgpfiletos3 --zip-file fileb://${DIR}/upload_pgp_file_to_s3.zip
