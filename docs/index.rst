@@ -3,17 +3,18 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to PGP-based anonymous exam site's documentation!
-=========================================================
+一個基於 PGP 機制的匿名筆試網站文件集
+===============================================================================
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+    :maxdepth: 2
+    :caption: 目錄
 
+    user_requirement
+    technique
 
-
-Indices and tables
-==================
+索引與表格
+===============================================================================
 
 * :ref:`genindex`
 * :ref:`modindex`
