@@ -129,12 +129,9 @@ function send_encrypt_content($self) {
                                 ).css({'readonly': 'readonly', 'disabled': 'disabled'});
                                 if (json['message'] == filename) {
                                     show_modal($('#primary_modal'), 'Upload Successfully', filename + ' is uploaded');
-                                } else if (json['message'].indexOf('1Q.asc') > 0) {
-                                    show_modal($('#primary_modal'), 'Registering Successfully', 'We already generated the 1Q.asc, please reload your browser, or wait for 5 seconds to reload.');
-                                    setTimeout("location.reload", 5000);
                                 } else {
                                     var url = '/' + json['message'] + '/index.html';
-                                    var message = 'Please go to <a href="'+url+'">'+url+'</a>, and keep the url path in mind.  That is a combination of your public key email and id.';
+                                    var message = 'Please go to <a href="'+url+'">'+url+'</a>, and keep the url path in mind.  That is a combination of your public key email and id.  We already generated the unique <b>1Q.asc</b> for you.  <b>Good Luck!!!</b>';
                                     show_modal($('#primary_modal'), 'Register Successfully', message);
                                 }
                             } else {
