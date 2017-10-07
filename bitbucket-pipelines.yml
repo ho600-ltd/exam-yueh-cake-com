@@ -31,8 +31,8 @@ pipelines:
             - sed "s/\${BUILD_TIME}/${BUILD_TIME}/g" __index.html > ___index.html
             - mv ___index.html index.html
             - rm -rf *_index.html
-            - cd ..
-            - sed -i "s/{{ datetime }}/${BUILD_TIME}/g" pipeline-messages.json
-            - sed -i "s/{{ commit_hash }}/${BITBUCKET_COMMIT}/g" pipeline-messages.json
+            - cd ../../
+            - sed -i "s/\${BUILD_TIME}/${BUILD_TIME}/g" pipeline-messages.json
+            - sed -i "s/\${commit_hash}/${BITBUCKET_COMMIT}/g" pipeline-messages.json
             - aws s3 sync exam.yueh-cake.com s3://exam.yueh-cake.com
             - aws ses send-email --region us-west-2 --from service@ho600.com --destination file://pipeline-destination.json --message file://pipeline-messages.json
