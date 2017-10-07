@@ -10,7 +10,7 @@ pipelines:
     master:
       - step:
           script: # Modify the commands below to build your repository.
-            - GIT_LOG=`git log --pretty=format:"%h %an %ad %s" -1`
+            - GIT_LOG=`git log --pretty=format:"%h %an %ad %s" -1|tr '\\' ' '`
             - BUILD_TIME=`date +%Y-%m-%dT%H:%M:%S%z`
             - REVISION=${BITBUCKET_COMMIT::4}
             - pip install "awscli>=1.11,<1.12" "Sphinx>=1.6,<1.7" "sphinx_rtd_theme>=0.2,<0.3"
