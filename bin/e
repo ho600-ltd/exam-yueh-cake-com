@@ -1,2 +1,2 @@
 #!/bin/bash
-source /var/www/exam-yueh-cake-com-env/bin/activate
+source .py3env/bin/activate

@@ -14,4 +14,4 @@ bin/LambdaJobsHo600Com_function.zip
 bin/pgp_encrypt.zip
 aws_lambda/pgp_encrypt/node_modules/
 aws_lambda/pgp_encrypt/package-lock.json
-
+.py*env/

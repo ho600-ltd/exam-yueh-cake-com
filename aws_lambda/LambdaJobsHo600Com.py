@@ -26,7 +26,7 @@ def lambda_handler(event, context):
         if 1:
             raise Exception('403 Forbidden: close the jobs offering')
         else:
-            unique_email = '%s@exam.yueh-cake.com' % md5(str(random())).hexdigest().lower()
+            unique_email = '%s@exam.yueh-cake.com' % md5(str(random()).encode('utf-8')).hexdigest().lower()
             email = unique_email
             message = unique_email
     else:
@@ -45,8 +45,7 @@ def lambda_handler(event, context):
                                                       "original_email": email})
 
     try:
-        HTTPStatusCode = create_function(event)['ResponseMetadata'][
-            'HTTPStatusCode']
+        HTTPStatusCode = create_function(event)['ResponseMetadata']['HTTPStatusCode']
     except:
         HTTPStatusCode = 403
 

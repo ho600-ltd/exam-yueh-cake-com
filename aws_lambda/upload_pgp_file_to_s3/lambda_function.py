@@ -120,13 +120,13 @@ def lambda_handler(event, context):
 
     INFO: pgpdump has problem on parse expiration_time.
     """
-    public_key_content = event.get('public_key_content', '')
+    public_key_content = event.get('public_key_content', '').encode('utf-8')
     filename = event['filename']
     if filename != '0A.asc' and filename[1] == 'A':
-        encrypt_content = event['encrypt_content']
+        encrypt_content = event['encrypt_content'].encode('utf-8')
         encrypt_file_key_id_list = []
         for pkeskp in list(AsciiData(encrypt_content).packets()):
-            encrypt_file_key_id = getattr(pkeskp, 'key_id', '')[-8:].upper()
+            encrypt_file_key_id = getattr(pkeskp, 'key_id', '')[-8:].upper().decode('utf-8')
             if encrypt_file_key_id: encrypt_file_key_id_list.append(encrypt_file_key_id)
         if len(encrypt_file_key_id_list) != 2:
             return {'status': 403, 'message': '403 Forbidden: PublicKeyCountError'}
@@ -167,7 +167,7 @@ def lambda_handler(event, context):
         raw_pub_algorithm = adps[0].raw_pub_algorithm
         user_name = adps[1].user_name.lower()
         user_email = adps[1].user_email.lower()
-        public_key_file_key_id = adps[3].key_id[-8:].upper()
+        public_key_file_key_id = adps[3].key_id[-8:].upper().decode('utf-8')
 
         if pub_algorithm_type != 'rsa' or raw_pub_algorithm != 1:
             return {'status': 403, 'message': '403 Forbidden: PublicKey TypeError'}
@@ -185,11 +185,11 @@ def lambda_handler(event, context):
         elif item.get('public_key_id', ''):
             return {'status': 403, 'message': '403 Forbidden: PublicKeyAlreadyExist'}
 
-        encrypt_content = event['encrypt_content']
+        encrypt_content = event['encrypt_content'].encode('utf-8')
         encrypt_file_key_id_list = []
         for pkeskp in list(AsciiData(encrypt_content).packets()):
             encrypt_file_key_id = getattr(pkeskp, 'key_id', '')[-8:].upper()
-            if encrypt_file_key_id: encrypt_file_key_id_list.append(encrypt_file_key_id)
+            if encrypt_file_key_id: encrypt_file_key_id_list.append(encrypt_file_key_id.decode('utf-8'))
         if len(encrypt_file_key_id_list) != 2:
             return {'status': 403, 'message': '403 Forbidden: PublicKeyCountError'}
         elif PUBLIC_KEY_ID not in encrypt_file_key_id_list or public_key_file_key_id not in encrypt_file_key_id_list:
@@ -198,12 +198,12 @@ def lambda_handler(event, context):
         s3 = boto3.client('s3')
 
         response = s3.get_object( Bucket=S3_BUCKET, Key='%s/index.html' % S3_LOCATION)
-        index_html = response['Body'].read()
+        index_html = response['Body'].read().decode('utf-8')
         user_directory = '%s/%s-%s' % (S3_LOCATION, user_email, public_key_file_key_id)
         index_html = re.sub('<div id="build_version">.*</div>',
-                            '<div id="create_time">Create Time at %s</div>'%datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S+UTC'), index_html)
+                            '<div id="create_time">Create Time at {}</div>'.format(datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S+UTC')), index_html)
         index_html = re.sub('(<textarea[^>]+name="public_key_content")></textarea>',
-                            '\\1 readonly="readonly" style="background-color : #d1d1d1;">%s</textarea>'%public_key_content,
+                            '\\1 readonly="readonly" style="background-color : #d1d1d1;">{}</textarea>'.format(public_key_content),
                             index_html)
         index_html = re.sub('<li[^>]+id="0A"[^>]+>', '<li id="0A">', index_html)
 
@@ -243,7 +243,7 @@ def lambda_handler(event, context):
                               "email": public_key_file_key_id,
                               "public_key_id_email": user_email,
                               "type": 'reverse-apply-account-at-exam.yueh-cake.com'})
-        Q1 = encrypt_text(random_q1(), public_keys=[PUBLIC_KEY_CONTENT, public_key_content])
+        Q1 = encrypt_text(random_q1(), public_keys=[PUBLIC_KEY_CONTENT, public_key_content.decode('utf-8')])
         response = s3.put_object(
             ACL='public-read',
             Body=Q1,
@@ -297,7 +297,7 @@ def encrypt_text(text, public_keys=[PUBLIC_KEY_CONTENT]):
         LogType='None',
         Payload=json.dumps(data),
     )
-    encrypt_content = json.loads(response['Payload'].read()).replace(r"\r\n", "\n").replace(r"\n", "\n")
+    encrypt_content = json.loads(response['Payload'].read().decode('utf-8')).replace(r"\r\n", "\n").replace(r"\n", "\n")
     return encrypt_content
 
 
@@ -308,4 +308,4 @@ if __name__ == '__main__':
         "filename": "0A.asc",
         "encrypt_content": open('id.txt.asc', 'r').read(),
          }
-    lambda_handler(d, None)
+    print(lambda_handler(d, None))
