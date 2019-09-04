@@ -1,6 +1,6 @@
 {
     "name": "s3-cp-static-files-to-exam-yueh-cake-com",
-    "description": "Use aws s3 cp to copy static files from codecommit:exam-yueh-cake-com to s3://jobs.ho600.com",
+    "description": "Use aws s3 cp to copy static files from codecommit:exam-yueh-cake-com to s3://exam.yueh-cake.com",
     "source": {
         "type": "CODECOMMIT",
         "location": "https://git-codecommit.us-west-2.amazonaws.com/v1/repos/exam-yueh-cake-com",
