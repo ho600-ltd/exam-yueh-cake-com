@@ -1,0 +1,48 @@
+version: 0.2
+
+phases:
+  install:
+    #如果使用 Ubuntu 標準映像 2.0 或更新版本，您必須指定執行時間版本。
+    #如果指定執行時間版本且使用非 Ubuntu 標準映像 2.0 的映像，建置會失敗。
+    runtime-versions:
+      python: 3.7
+      # name: version
+    #commands:
+      # - command
+      # - command
+  pre_build:
+    commands:
+      - pip install --upgrade pip
+      - pip install --upgrade awscli
+      # - command
+  build:
+    commands:
+      - export COMMIT_CHANGESET=$(git rev-parse HEAD)
+      - export SHORT_COMMIT_CHANGESET=$(git rev-parse --short=7 HEAD)
+      - export BUILD_TIME=$(date +%Y-%m-%dT%H:%M:%S%z)
+      - echo -e '{ "BUILD_TIME"':' "'${BUILD_TIME}'",\n   "COMMIT_CHANGESET"':' "'${COMMIT_CHANGESET}'" }' > exam.yueh-cake.com/__version__.json
+      - sed -i -e "s/\${BUILD_TIME}/${BUILD_TIME}/g" exam.yueh-cake.com/index.html
+      - sed -i -e "s/\${REVISION}/${COMMIT_CHANGESET}/g" exam.yueh-cake.com/index.html
+      - sed -i -e "s/\${SHORT_REVISION}/${SHORT_COMMIT_CHANGESET}/g" exam.yueh-cake.com/index.html
+      - sed -i -e "s/\${BUILD_TIME}/${BUILD_TIME}/g" exam.yueh-cake.com/jobs.at.ho600/index.html
+      - sed -i -e "s/\${REVISION}/${COMMIT_CHANGESET}/g" exam.yueh-cake.com/jobs.at.ho600/index.html
+      - sed -i -e "s/\${SHORT_REVISION}/${SHORT_COMMIT_CHANGESET}/g" exam.yueh-cake.com/jobs.at.ho600/index.html
+      - aws s3 cp --recursive exam.yueh-cake.com s3://exam.yueh-cake.com
+  #post_build:
+    #commands:
+      # - command
+      # - command
+#artifacts:
+  #files:
+    #- jobs-ho600-com/*
+  #secondary-artifacts:
+    #promo:
+      #files:
+        #- promo-jobs-ho600-com/*
+    # - location
+  #name: $(date +%Y-%m-%d)
+  #discard-paths: yes
+  #base-directory: location
+#cache:
+  #paths:
+    # - paths

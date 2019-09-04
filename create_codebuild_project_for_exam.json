@@ -1,0 +1,53 @@
+{
+    "name": "s3-cp-static-files-to-exam-yueh-cake-com",
+    "description": "Use aws s3 cp to copy static files from codecommit:exam-yueh-cake-com to s3://jobs.ho600.com",
+    "source": {
+        "type": "CODECOMMIT",
+        "location": "https://git-codecommit.us-west-2.amazonaws.com/v1/repos/exam-yueh-cake-com",
+        "gitCloneDepth": 0,
+        "gitSubmodulesConfig": {
+            "fetchSubmodules": true
+        },
+        "buildspec": "buildspec.yml",
+        "insecureSsl": true,
+        "sourceIdentifier": "primary"
+    },
+    "sourceVersion": "master",
+    "environment": {
+        "type": "LINUX_CONTAINER",
+        "image": "aws/codebuild/standard:2.0",
+        "computeType": "BUILD_GENERAL1_SMALL",
+        "environmentVariables": [
+            {
+                "name": "WHATEVER",
+                "value": "WHATVALUE",
+                "type": "PLAINTEXT"
+            }
+        ],
+        "privilegedMode": true,
+        "imagePullCredentialsType": "CODEBUILD"
+    },
+    "serviceRole": "arn:aws:iam::842060947928:role/service-role/role-sync-static-files-to-s3-buckets",
+    "timeoutInMinutes": 60,
+    "queuedTimeoutInMinutes": 60,
+    "tags": [
+        {
+            "key": "CODEBUILD_PROJECT_TYPE",
+            "value": "static_files"
+        }
+    ],
+    "artifacts": {
+        "type": "NO_ARTIFACTS"
+    },
+    "badgeEnabled": true,
+    "logsConfig": {
+        "cloudWatchLogs": {
+            "status": "DISABLED"
+        },
+        "s3Logs": {
+            "status": "ENABLED",
+            "location": "aws-config-devf51a0b3c7fdba0c2/codebuild-logs/s3-cp-static-files-to-exam-yueh-cake-com",
+            "encryptionDisabled": true
+        }
+    }
+}
