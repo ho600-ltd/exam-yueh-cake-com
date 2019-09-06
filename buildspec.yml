@@ -14,13 +14,12 @@ phases:
     commands:
       - pip install --upgrade pip
       - pip install --upgrade awscli
-      # - command
-  build:
-    commands:
       - export COMMIT_CHANGESET=$(git rev-parse HEAD)
       - export SHORT_COMMIT_CHANGESET=$(git rev-parse --short=7 HEAD)
       - export BUILD_TIME=$(date +%Y-%m-%dT%H:%M:%S%z)
-      - echo -e '{ "BUILD_TIME"':' "'${BUILD_TIME}'",\n   "COMMIT_CHANGESET"':' "'${COMMIT_CHANGESET}'" }' > exam.yueh-cake.com/__version__.json
+      - echo -e '{ "CODEBUILD_BUILD_ID"':' "'${CODEBUILD_BUILD_ID}'",\n  "BUILD_TIME"':' "'${BUILD_TIME}'",\n   "COMMIT_CHANGESET"':' "'${COMMIT_CHANGESET}'" }' > exam.yueh-cake.com/__version__.json
+  build:
+    commands:
       - sed -i -e "s/\${BUILD_TIME}/${BUILD_TIME}/g" exam.yueh-cake.com/index.html
       - sed -i -e "s/\${REVISION}/${COMMIT_CHANGESET}/g" exam.yueh-cake.com/index.html
       - sed -i -e "s/\${SHORT_REVISION}/${SHORT_COMMIT_CHANGESET}/g" exam.yueh-cake.com/index.html
