@@ -1,6 +1,7 @@
 *** An anonymous exam site with PGP mechanism ***
 
-Please go to [http://exam-yueh-cake-com.readthedocs.io](http://exam-yueh-cake-com.readthedocs.io) to see documentation.
+Please go to [http://exam-yueh-cake-com.readthedocs.io](http://exam-yueh-cake-com.readthedocs.io) to see documentation. [![Documentation Status](https://readthedocs.org/projects/exam-yueh-cake-com/badge/?version=master)](https://exam-yueh-cake-com.readthedocs.io/zh_TW/master/?badge=master)
+      
 
 And live site in [https://exam.yueh-cake.com/](https://exam.yueh-cake.com/). ![build-status-image]
 
