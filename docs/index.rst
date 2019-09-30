@@ -12,10 +12,3 @@
 
     user_requirement
     technique
-
-索引與表格
-===============================================================================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
